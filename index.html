@@ -104,7 +104,7 @@ footer b{font:700 20px Georgia,serif;color:#fff}
 <!-- 2. ДЫБЫСТАР ӘЛЕМІ -->
 <section id="sounds">
 <h2>Дыбыстар әлемі</h2>
-<p>Play батырмасын басыңыз. Өз жазбаңыз болса, картадағы «MP3 жүктеу» арқылы қосыңыз — ол синтезделген үлгінің орнына ойнатылады.</p>
+<p>Әр дыбыстың ойнатқышындағы ▶ батырмасын басыңыз (дыбыс деңгейін, алға-артқа жылжытуды да осы ойнатқыштан басқаруға болады). Дыбыстар — интернеттегі ашық лицензиялы (Wikimedia Commons) нақты жазбалар, сондықтан алғашқы жүктелуге бірнеше секунд кетуі мүмкін. Өз жазбаңыз болса, картадағы «MP3 жүктеу» арқылы қосыңыз — ол ойнатылады.</p>
 <div class="grid" id="cards"></div>
 </section>
 
@@ -177,13 +177,27 @@ function show(id){
 document.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)show(b.dataset.s)});
 
 /* ---------- Дыбыстар ---------- */
+/* Нақты жазбалар: Wikimedia Commons (ашық лицензиялы). u — сілтемелер тізімі: бірінші жүктелмесе, келесісі, ең соңында синтезделген үлгі. */
+const C='https://commons.wikimedia.org/wiki/Special:FilePath/';
 const SOUNDS=[
- {id:'water',n:'Судың сылдыры',e:'💧',bg:'#d8f0f3'},
- {id:'wind',n:'Желдің гуілі',e:'🍃',bg:'#e4f4dc'},
- {id:'leaves',n:'Жапырақтардың сыбдыры',e:'🌳',bg:'#cfeac2'},
- {id:'bird',n:'Құстардың әні',e:'🐦',bg:'#d8f0f3'},
- {id:'car',n:'Көлік шуы',e:'🚗',bg:'#eef3f4'},
- {id:'voices',n:'Қаладағы адамдардың дауысы',e:'🏙',bg:'#e8f0ec'}
+ {id:'water',d:'Таяз өзеннің тастар үстімен ағып жатқан сылдыры.',n:'Судың сылдыры',e:'💧',bg:'#d8f0f3',
+  u:[C+'Shallow_small_river_with_stony_riverbed.ogg',C+'A_little_river.ogg'],
+  c:'Wikimedia Commons: «Shallow small river with stony riverbed.ogg»'},
+ {id:'wind',d:'Ағаштар арасынан соққан желдің гуілі, күшейіп, бәсеңдейді.',n:'Желдің гуілі',e:'🍃',bg:'#e4f4dc',
+  u:['https://upload.wikimedia.org/transcoded/d/d0/Wind_sounds_2020-05-10_1625.mp3/Wind_sounds_2020-05-10_1625.mp3.ogg',C+'Wind_sounds_2020-05-10_1625.mp3'],
+  c:'Robert EA Harvey, Wikimedia Commons, CC BY-SA 4.0'},
+ {id:'leaves',d:'Желмен қозғалған құрғақ жапырақтардың сыбдыры.',n:'Жапырақтардың сыбдыры',e:'🌳',bg:'#cfeac2',
+  u:['https://sonicdictionary.duke.edu/sites/sonicdictionary.duke.edu/files/site-files/018618b6b075c9df37fdb921392b4cc6.wav','https://upload.wikimedia.org/transcoded/1/1b/Leaves_falling_from_the_trees_during_autumn_in_the_forest.wav/Leaves_falling_from_the_trees_during_autumn_in_the_forest.wav.mp3',C+'Leaves_falling_from_the_trees_during_autumn_in_the_forest.wav'],
+  c:'«Leaves Rustling», PSYCHOacoustic99 (Duke Sonic Dictionary), CC BY-NC 4.0 — нақты жазба'},
+ {id:'bird',d:'Қара торғайдың әні: ұзақ, сызылған әуен.',n:'Құстардың әні',e:'🐦',bg:'#d8f0f3',
+  u:[C+'Common_Blackbird_(Turdus_merula)_(W1CDR0001425_BD22).ogg'],
+  c:'Қара торғай (Turdus merula), Lawrence Shove / The British Library, Wikimedia Commons, CC BY-SA 4.0'},
+ {id:'car',d:'Қала көшесіндегі көліктердің бірқалыпты шуы.',n:'Көлік шуы',e:'🚗',bg:'#eef3f4',
+  u:[C+'Sunday_in_the_city_street_noise2.ogg'],
+  c:'Wikimedia Commons: «Sunday in the city street noise2.ogg»'},
+ {id:'voices',d:'Базардағы адамдардың аралас сөйлескен дауысы.',n:'Қаладағы адамдардың дауысы',e:'🏙',bg:'#e8f0ec',
+  u:[C+'Italia_Palermo_mercato-Ballaro_20161225_122421.ogg'],
+  c:'Wikimedia Commons: «Italia Palermo mercato-Ballaro 20161225 122421.ogg» (базар, адамдар дауысы)'}
 ];
 let ctx,nb,cur=null;
 function ac(){
@@ -214,33 +228,23 @@ function synth(type){
     chirp();timer=setInterval(chirp,1400)}
   return()=>{src.forEach(s=>{try{s.stop()}catch(e){}});clearInterval(timer);out.disconnect()};
 }
-function stopAll(){if(cur){cur.stop();cur=null}}
+function stopAll(){document.querySelectorAll('audio').forEach(a=>a.pause())}
 const cards=document.getElementById('cards');
 SOUNDS.forEach(s=>{
   const d=document.createElement('div');d.className='card';
   d.innerHTML=`<div class="pic" style="background:${s.bg}" aria-hidden="true">${s.e}</div>
   <div class="cb"><h3>${s.n}</h3>
-  <div class="row"><button class="play" aria-pressed="false">▶ Play</button></div>
-  <label class="up">MP3 жүктеу<br><input type="file" accept="audio/mpeg,audio/mp3,.mp3"></label>
-  <p class="src">Көзі: синтезделген үлгі</p></div>`;
-  const btn=d.querySelector('.play'),file=d.querySelector('input'),src=d.querySelector('.src');
-  let audio=null;
-  const reset=()=>{btn.textContent='▶ Play';btn.classList.remove('on');btn.setAttribute('aria-pressed','false')};
+  <audio controls loop preload="none" style="width:100%" aria-label="${s.n}">${s.u.map(u=>`<source src="${u}">`).join('')}Браузеріңіз аудионы қолдамайды.</audio>
+  <p class="src"><b>Сипаттамасы:</b> ${s.d}</p>
+  <label class="up">MP3 жүктеу<br><input type="file" accept="audio/*"></label>
+  <p class="src" data-src>Көзі: ${s.c}</p></div>`;
+  const au=d.querySelector('audio'),file=d.querySelector('input'),src=d.querySelector('[data-src]');
+  au.addEventListener('play',()=>{document.querySelectorAll('audio').forEach(x=>{if(x!==au)x.pause()})});
+  au.addEventListener('error',()=>{if(au.networkState===3)src.textContent='Жазба жүктелмеді. Интернетті тексеріп, бетті жаңартыңыз немесе өз MP3 файлыңызды жүктеңіз.'},true);
   file.addEventListener('change',()=>{
     const f=file.files[0];if(!f)return;
-    if(cur&&cur.btn===btn)stopAll();
-    if(audio)URL.revokeObjectURL(audio.src);
-    audio=new Audio(URL.createObjectURL(f));audio.loop=true;
+    au.pause();au.innerHTML='';au.src=URL.createObjectURL(f);au.load();
     src.textContent='Көзі: '+f.name;
-  });
-  btn.addEventListener('click',()=>{
-    if(cur&&cur.btn===btn){stopAll();return}
-    stopAll();
-    let end;
-    if(audio){audio.currentTime=0;audio.play();end=()=>audio.pause()}
-    else end=synth(s.id);
-    cur={btn,stop:()=>{end();reset()}};
-    btn.textContent='⏸ Pause';btn.classList.add('on');btn.setAttribute('aria-pressed','true');
   });
   cards.appendChild(d);
 });
