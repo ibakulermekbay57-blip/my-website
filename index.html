@@ -43,11 +43,13 @@ section.on{display:block}
 .up{font-size:13px;color:var(--mut);display:block;margin-top:10px}
 .up input{max-width:100%;font-size:13px}
 .src{font-size:13px;color:var(--mut);margin:6px 0 0}
-.mapbox{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px}
-@media(max-width:760px){.mapbox{grid-template-columns:1fr}}
-svg{width:100%;height:auto;background:var(--sky);border-radius:20px}
-.zone{cursor:pointer;stroke:#fff;stroke-width:3;transition:opacity .15s}
-.zone:hover,.zone.sel{opacity:.8;stroke:var(--dg)}
+.mapbox{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px}
+@media(max-width:860px){.mapbox{grid-template-columns:1fr}}
+svg{width:100%;height:auto;background:#f5f4f2;border-radius:20px;display:block}
+.zone{cursor:pointer;fill-opacity:.5;stroke:none;transition:fill-opacity .15s}
+.zone:hover{fill-opacity:.68}
+.zone.sel{fill-opacity:.72;stroke:#143f2c;stroke-width:6}
+.zone:focus-visible{outline:none;stroke:#143f2c;stroke-width:6}
 .info{background:var(--lg);border-radius:20px;padding:20px;align-self:start}
 .leg{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .leg button{border:2px solid var(--dg);background:#fff;border-radius:99px;padding:6px 14px}
@@ -109,17 +111,35 @@ footer b{font:700 20px Georgia,serif;color:#fff}
 <!-- 3. КАРТА -->
 <section id="map">
 <h2>Дыбыстық карта</h2>
-<p>Аймақты немесе түсті басыңыз — сипаттамасы оң жақта көрінеді.</p>
+<p>Қызыл сызықпен қоршалған аумақ — Сарыағаш. Аймақты немесе түсті басыңыз — сипаттамасы оң жақта көрінеді.</p>
 <div class="mapbox">
 <div>
-<svg viewBox="0 0 400 300" role="img" aria-label="Сарыағаш аумағының сызбасы">
-<path class="zone" id="z-g" data-z="g" tabindex="0" role="button" aria-label="Жасыл аймақ" d="M20 40 L190 20 L210 120 L120 170 L25 150 Z" fill="#3a9d5d"/>
-<path class="zone" id="z-y" data-z="y" tabindex="0" role="button" aria-label="Сары аймақ" d="M190 20 L380 50 L370 140 L210 120 Z" fill="#e6b422"/>
-<path class="zone" id="z-r" data-z="r" tabindex="0" role="button" aria-label="Қызыл аймақ" d="M25 150 L120 170 L210 120 L370 140 L350 270 L60 280 Z" fill="#d64545"/>
-<g font-size="14" fill="#fff" font-family="system-ui" text-anchor="middle" pointer-events="none" font-weight="700">
-<text x="105" y="95">Жасыл</text><text x="285" y="85" fill="#143f2c">Сары</text><text x="210" y="220">Қызыл</text></g>
+<svg id="mapSvg" viewBox="0 0 1424 750" role="img" aria-label="Сарыағаш аумағының картасы: жасыл, сары және қызыл дыбыстық аймақтар">
+<defs>
+<clipPath id="cp"><path id="outline" d="M372 88 L420 76 L470 72 L500 85 L535 104 L600 100 L660 100 L720 72 L770 45 L805 27 L850 38 L908 53 L960 34 L1020 31 L1065 38 L1080 52 L1130 62 L1143 95 L1155 125 L1145 170 L1160 200 L1185 225 L1200 258 L1240 265 L1282 298 L1270 330 L1250 355 L1260 372 L1290 378 L1285 398 L1230 400 L1185 418 L1140 402 L1110 405 L1085 425 L1085 450 L1050 462 L1040 488 L1005 480 L995 520 L985 545 L1000 570 L997 598 L970 600 L900 660 L850 690 L800 725 L790 750 L645 750 L685 715 L680 697 L640 693 L590 688 L545 680 L500 660 L482 635 L500 600 L520 560 L515 545 L490 537 L460 545 L425 566 L410 555 L385 515 L368 495 L372 470 L355 450 L360 420 L372 395 L362 370 L345 345 L355 320 L345 290 L335 255 L325 220 L320 180 L330 160 L345 135 L360 115 Z"/></clipPath>
+</defs>
+
+<!-- Карта суреті: осы HTML файлымен бір папкаға saryagash-map.jpg деп сақтаңыз -->
+<image id="mapImg" href="saryagash-map.jpg" x="0" y="0" width="1424" height="750" preserveAspectRatio="xMidYMid slice"/>
+
+<!-- Аймақтар тек қызыл сызықтың ішінде көрінеді -->
+<g clip-path="url(#cp)">
+<path class="zone" id="z-g" data-z="g" tabindex="0" role="button" aria-label="Жасыл аймақ" fill="#3a9d5d" d="M300 20 H1320 V760 H300 Z"/>
+<path class="zone" id="z-y" data-z="y" tabindex="0" role="button" aria-label="Сары аймақ" fill="#e6b422" d="M1000 170 L1300 170 L1300 430 L1020 430 L1020 480 L760 480 L700 420 L800 300 L900 200 Z"/>
+<path class="zone" id="z-r" data-z="r" tabindex="0" role="button" aria-label="Қызыл аймақ" fill="#d64545" d="M760 480 L1020 480 L1020 760 L760 760 Z"/>
+</g>
+
+<!-- Қызыл шекара сызығы -->
+<use href="#outline" fill="none" stroke="#7a1f1f" stroke-width="5" stroke-linejoin="round" pointer-events="none"/>
+
+<g font-size="34" fill="#fff" font-family="system-ui" text-anchor="middle" pointer-events="none" font-weight="700" stroke="#143f2c" stroke-width="5" paint-order="stroke">
+<text x="560" y="260">Жасыл</text>
+<text x="1130" y="300">Сары</text>
+<text x="885" y="590">Қызыл</text>
+</g>
 </svg>
-<p class="src">Бұл — көрнекі сызба. Нақты картаның суретін қоссаңыз, аймақтарды соған бейімдеуге болады.</p>
+<p class="src" id="mapNote">Карта суретін осы HTML файлымен бір папкаға <b>saryagash-map.jpg</b> деген атпен сақтаңыз. Немесе төменнен таңдаңыз.</p>
+<label class="up">Карта суретін таңдау<br><input type="file" id="mapFile" accept="image/*"></label>
 <div class="leg" id="leg"></div>
 </div>
 <div class="info" id="info" aria-live="polite"><h3>Аймақты таңдаңыз</h3><p>Жасыл, сары немесе қызыл аймақты басыңыз.</p></div>
@@ -246,6 +266,14 @@ Object.keys(ZONES).forEach(k=>{
   b.innerHTML=`<span class="dot" style="background:${ZONES[k].c}"></span>${ZONES[k].t.split(' — ')[0]}`;
   b.onclick=()=>pick(k);leg.appendChild(b);
 });
+/* Карта суретін қолмен таңдау */
+const mapImg=document.getElementById('mapImg'),mapNote=document.getElementById('mapNote');
+document.getElementById('mapFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  mapImg.setAttribute('href',URL.createObjectURL(f));
+  mapNote.textContent='Карта суреті: '+f.name;
+});
+mapImg.addEventListener('load',()=>{mapNote.textContent='Қызыл сызықпен қоршалған аумақ — Сарыағаш аймағы.'});
 
 /* ---------- Сауалнама ---------- */
 /* Сұрақтарды өз сұрақтарыңызға ауыстырыңыз: o — нұсқалар тізімі, o жоқ болса — ашық жауап */
